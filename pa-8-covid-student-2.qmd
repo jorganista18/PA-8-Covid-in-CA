@@ -160,3 +160,24 @@ cases |>
 ### Create your own graph
 
 Using the COVID-19 data, create your graph to answer you own research question. You will submit that graph as png file in your Canvas quiz. Include your research question as the subtitle of the graph.  
+
+```{r}
+cases |> 
+  filter(state == "California",
+         format(date, "%Y") == "2020") |> #filter to CA
+  mutate(date = date(date), #using the date within raw data
+         month = month(date, label = TRUE, abbr = FALSE), #using the month of the date
+         year = year(date) #using the year of the date 
+         ) |> 
+  unite(Month, "month", "year" , sep = "-") |> #uniting the month and year columns
+  group_by(Month) |> #using Months
+  summarize(Total_Cases = sum(cases_daily)) |> #finding sum of cases_daily
+  ggplot() + #creating plot
+    geom_col(mapping = aes(y = fct_reorder(Month,my(Month)),
+                           x = Total_Cases,
+                           ))+
+  labs(title="Covid Cases in California in 2020",
+       subtitle="Which months showed the initial spike in COVID cases in CA, 2020?") 
+  ggsave("COVID2020.png")
+```
+
